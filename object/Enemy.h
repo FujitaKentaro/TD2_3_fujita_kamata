@@ -47,7 +47,7 @@ public:
 	void Hit();
 	Vector3 GetWorldPosition() { return Affin::GetWorldTrans(worldTransForm.matWorld_); };
 	Vector3 GetFrontVec() { return enemyFront; };
-	void SetGameScene(GameScene* gameScene) { this->gameScene = gameScene; };
+	void SetGameScene(GameScene* gameScene_) { gameScene = gameScene_; };
 	void OnColision();
 	bool IsDead() const { return isDead; };
 	void Attack(Model* model_);

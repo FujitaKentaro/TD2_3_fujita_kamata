@@ -28,7 +28,7 @@ void EnemyBullet::Update()
 	if (isDead==false) {
 		if (deadCount > 0) {			
 
-			worldTransform_.translation_ += bulletSpe*00000.1;
+			worldTransform_.translation_ += bulletSpe*0.1;
 
 			worldTransform_.matWorld_ *= Affin::matWorld(worldTransform_.translation_, worldTransform_.rotation_, worldTransform_.scale_);
 			//çsóÒÇÃçƒåvéZ

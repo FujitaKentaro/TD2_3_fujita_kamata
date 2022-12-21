@@ -161,17 +161,19 @@ void GameScene::Update() {
 
 		//デスフラグの立った弾を削除
 		bullets_.remove_if([](std::unique_ptr<Bullet>& bullet) { return bullet->IsDead(); });
-		////デスフラグの立った弾を削除
-		//eneBullets_.remove_if(
-		//	[](std::unique_ptr<EnemyBullet>& bullet) { return bullet->IsDead(); });
+		//デスフラグの立った弾を削除
+		eneBullets_.remove_if(
+			[](std::unique_ptr<EnemyBullet>& bullet) { return bullet->IsDead(); });
 
 		//敵ポップ
+		for (int i = 0; i < _countof(enemys); i++) {
+				enemys[i].SetGameScene(gameScene_);
+		}
 		if (waitTimer == 0) {
 			if (popCount > 0) {
 				if (popTime == 0) {
 					for (int i = 0; i < _countof(enemys); i++) {
 						if (enemys[i].isDead == true) {
-							enemys[i].SetGameScene(gameScene_);
 							enemys[i].Pop(Affin::GetWorldTrans(PopPos_[popRand].matWorld_), popRand);
 							
 							break;
@@ -346,9 +348,9 @@ void GameScene::Update() {
 		for (int i = 0; i < _countof(enemys); i++) {
 			enemys[i].Update(model_, objHome_.translation_);
 		}
-		/*for (std::unique_ptr<EnemyBullet>& Ebullet : eneBullets_) {
+		for (std::unique_ptr<EnemyBullet>& Ebullet : eneBullets_) {
 			Ebullet->Update();
-		}*/
+		}
 
 		/// <summary>
 		/// 弾と敵の当たり判定
@@ -528,10 +530,10 @@ void GameScene::Draw() {
 		for (std::unique_ptr<Bullet>& bullet : bullets_) {
 			bullet->Draw(viewProjection_, textureHandle_[5]);
 		}
-		////弾描画
-		//for (std::unique_ptr<EnemyBullet>& Ebullet : eneBullets_) {
-		//	Ebullet->Draw(viewProjection_, textureHandle_[6]);
-		//}
+		//弾描画
+		for (std::unique_ptr<EnemyBullet>& Ebullet : eneBullets_) {
+			Ebullet->Draw(viewProjection_, textureHandle_[6]);
+		}
 	}
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
