@@ -13,6 +13,7 @@
 
 #include "object/Bullet.h"
 #include "object/Enemy.h"
+#include "object/EnemyBullet.h"
 
 /// <summary>
 /// ゲームシーン
@@ -33,7 +34,7 @@ public: // メンバ関数
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize();
+	void Initialize(GameScene* gameScene);
 
 	/// <summary>
 	/// 毎フレーム処理
@@ -55,7 +56,7 @@ public: // メンバ関数
 
 	int CheckAlive(Enemy enemy[]);
 
-	//void AddEnemyBullet(std::unique_ptr<EnemyBullet> enemyBullet);
+	void AddEnemyBullet(std::unique_ptr<EnemyBullet> enemyBullet);
 
 private: // メンバ変数
 	GameScene* gameScene_ = nullptr;
@@ -118,6 +119,8 @@ private: // メンバ変数
 	Vector3 resultRet;
 	// 敵
 	Enemy enemys[50];
+	//弾
+	std::list<std::unique_ptr<EnemyBullet>> eneBullets_;
 	// 敵
 	int popTime;
 	int coolTime;
@@ -128,19 +131,6 @@ private: // メンバ変数
 
 	// シーン
 	int scene = 0;
-
-	//yの仮ベクトル
-	Vector3 yTmpVec;
-	//正面仮ベクトル
-	Vector3 frontTmp;
-	//右ベクトル
-	Vector3 rightVec;
-	//左ベクトル
-	Vector3 leftVec;
-	//正面ベクトル
-	Vector3 frontVec;
-	//背面ベクトル
-	Vector3 behindVec;
 
 	int a;
 	float kCharacterSpeed = 0.1f;

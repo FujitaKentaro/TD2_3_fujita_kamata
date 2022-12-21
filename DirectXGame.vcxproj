@@ -104,6 +104,7 @@
     <ClCompile Include="math\Affin.cpp" />
     <ClCompile Include="object\Bullet.cpp" />
     <ClCompile Include="object\Enemy.cpp" />
+    <ClCompile Include="object\EnemyBullet.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
@@ -139,6 +140,7 @@
     <ClInclude Include="math\Vector4.h" />
     <ClInclude Include="object\Bullet.h" />
     <ClInclude Include="object\Enemy.h" />
+    <ClInclude Include="object\EnemyBullet.h" />
     <ClInclude Include="scene\GameScene.h" />
   </ItemGroup>
   <ItemGroup>

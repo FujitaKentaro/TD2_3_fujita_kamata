@@ -12,9 +12,9 @@ class EnemyBullet
 {
 public:
 
-	void Initialize(Model* model, const Vector3& position);
+	void Initialize(Model* model, const Vector3& position,Vector3 vector);
 
-	void Update(Vector3 trans);
+	void Update();
 
 	void Draw(const ViewProjection& viewProjection, uint32_t textureHandle);
 
@@ -25,14 +25,17 @@ public:
 	bool IsDead() const { return isDead; }
 
 public:
-	const float speed = 100;
-	const int r = 2;
+	
+	const int r = 1;
 private:
 	WorldTransform worldTransform_;
 	Model* model_ = nullptr;
+	Vector3 eneVec;
+	Vector3 bulletSpe/* = Vector3(0, 0, 10)*/;
 
-
+	int deadCount = 0;
 	bool isDead = false;
+	float speed = 3;
 
 
 };

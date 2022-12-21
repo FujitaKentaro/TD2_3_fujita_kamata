@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include <cassert>
+#include "GameScene.h"
 
 Enemy::Enemy() {
 	worldTransForm.Initialize();
@@ -24,10 +25,27 @@ void Enemy::CalcVec(Vector3 obj) {
 	enemyFront.normalize();
 }
 
-void Enemy::Update(Vector3 obj) {
+void Enemy::Update(Model* model_, Vector3 obj) {
+	assert(model_);
+	//デスフラグの立った弾を削除
+	bullets_.remove_if(
+		[](std::unique_ptr<EnemyBullet>& bullet) { return bullet->IsDead(); });
+
 
 	//ベクトル計算
 	CalcVec(obj);
+	if (coolTime == 0) {
+		Attack(model_);
+	}
+	else {
+		coolTime--;
+	}
+	//弾描画
+	for (std::unique_ptr<EnemyBullet>& Ebullet : bullets_) {
+		if (Ebullet->IsDead()==false) {
+			Ebullet->Update();
+		}
+	}
 
 	//行列計算
 
@@ -76,10 +94,20 @@ void Enemy::Update(Vector3 obj) {
 		break;
 	}
 
+
+
 	//結果を反映
 	worldTransForm.TransferMatrix();
-
+	
 	//Hit();
+}
+
+void Enemy::Draw(ViewProjection& viewProjection_, uint32_t textureHandle_) {
+	
+	//弾描画
+	for (std::unique_ptr<EnemyBullet>& Ebullet : bullets_) {
+		Ebullet->Draw(viewProjection_, textureHandle_);
+	}
 }
 
 void Enemy::Pop(Vector3 WorTrans, int seed) {
@@ -118,4 +146,29 @@ void Enemy::Hit() {
 
 void Enemy::OnColision() {
 	isDead = true;
+}
+
+void Enemy::Attack(Model* model_)
+{
+	assert(model_);
+	Vector3 pos;
+
+
+
+	//弾を生成し、初期化
+	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
+	//Bullet* newbullet = new Bullet();
+
+	pos = worldTransForm.translation_;
+
+	newBullet->Initialize(model_, pos, enemyFront);
+
+	//弾を登録
+	bullets_.push_back(std::move(newBullet));
+	//gameScene->AddEnemyBullet(std::move(newBullet));
+
+	//クールタイムをリセット
+	coolTime = 250;
+
+
 }

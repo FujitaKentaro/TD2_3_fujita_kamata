@@ -4,10 +4,14 @@
 #include "Affin.h"
 #include <random>
 
+#include "EnemyBullet.h"
+
+class GameScene;
+
 class Enemy {
 public:
 	WorldTransform worldTransForm;
-	int isDead;
+	bool isDead = true;
 	Vector3 enemyTmp;
 	Vector3 YTmp;
 	//右ベクトル
@@ -25,17 +29,26 @@ public:
 	int bulletcoolTime = 50;
 
 	int r = 2;
+	int coolTime = 250;
+
+	std::list<std::unique_ptr<EnemyBullet>> bullets_;
+
+	GameScene* gameScene = nullptr;
 
 public:
 	Enemy();
 	~Enemy();
 
-	void Update(Vector3 obj);
+	void Update(Model*model_,Vector3 obj);
+	void Draw(ViewProjection& viewProjection_, uint32_t textureHandle_);
 	
 	void CalcVec(Vector3 view);
 	void Pop(Vector3 WorTrans, int seed_);
 	void Hit();
 	Vector3 GetWorldPosition() { return Affin::GetWorldTrans(worldTransForm.matWorld_); };
+	Vector3 GetFrontVec() { return enemyFront; };
+	void SetGameScene(GameScene* gameScene) { this->gameScene = gameScene; };
 	void OnColision();
-	bool IsDead() const { return isDead; }
+	bool IsDead() const { return isDead; };
+	void Attack(Model* model_);
 };

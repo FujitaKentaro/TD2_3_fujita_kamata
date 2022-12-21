@@ -39,8 +39,9 @@ GameScene::~GameScene() {
 	delete model_;
 }
 
-void GameScene::Initialize() {
+void GameScene::Initialize(GameScene* gameScene) {
 
+	gameScene_ = gameScene;
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
@@ -160,6 +161,9 @@ void GameScene::Update() {
 
 		//デスフラグの立った弾を削除
 		bullets_.remove_if([](std::unique_ptr<Bullet>& bullet) { return bullet->IsDead(); });
+		////デスフラグの立った弾を削除
+		//eneBullets_.remove_if(
+		//	[](std::unique_ptr<EnemyBullet>& bullet) { return bullet->IsDead(); });
 
 		//敵ポップ
 		if (waitTimer == 0) {
@@ -167,7 +171,9 @@ void GameScene::Update() {
 				if (popTime == 0) {
 					for (int i = 0; i < _countof(enemys); i++) {
 						if (enemys[i].isDead == true) {
+							enemys[i].SetGameScene(gameScene_);
 							enemys[i].Pop(Affin::GetWorldTrans(PopPos_[popRand].matWorld_), popRand);
+							
 							break;
 						}
 					}
@@ -210,7 +216,7 @@ void GameScene::Update() {
 			}
 		}
 
-		
+
 
 		if (input_->PushKey(DIK_Q)) {
 			playerWTF[1].translation_.y = 2;
@@ -338,13 +344,16 @@ void GameScene::Update() {
 
 		//敵更新
 		for (int i = 0; i < _countof(enemys); i++) {
-			enemys[i].Update(objHome_.translation_);
+			enemys[i].Update(model_, objHome_.translation_);
 		}
+		/*for (std::unique_ptr<EnemyBullet>& Ebullet : eneBullets_) {
+			Ebullet->Update();
+		}*/
 
 		/// <summary>
 		/// 弾と敵の当たり判定
 		/// </summary>
-		
+
 		for (std::unique_ptr<Bullet>& bullet : bullets_) {
 			posA = bullet->GetWorldPosition();
 			//敵更新
@@ -504,6 +513,7 @@ void GameScene::Draw() {
 		for (int i = 0; i < _countof(enemys); i++) {
 			if (enemys[i].IsDead() == false) {
 				model_->Draw(enemys[i].worldTransForm, viewProjection_, textureHandle_[6]);
+				enemys[i].Draw(viewProjection_, textureHandle_[6]);
 			}
 		}
 		for (int i = 1; i < _countof(PopPos_); i++) {
@@ -512,10 +522,16 @@ void GameScene::Draw() {
 
 		modelWall_->Draw(wall_, viewProjection_);
 
+
+
 		//弾描画
 		for (std::unique_ptr<Bullet>& bullet : bullets_) {
 			bullet->Draw(viewProjection_, textureHandle_[5]);
 		}
+		////弾描画
+		//for (std::unique_ptr<EnemyBullet>& Ebullet : eneBullets_) {
+		//	Ebullet->Draw(viewProjection_, textureHandle_[6]);
+		//}
 	}
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -622,11 +638,15 @@ int GameScene::CheckAlive(Enemy enemys_[]) {
 			aliveNum++;
 		}
 	}
-	
+
 	if (aliveNum == 0) {
 		return true;
 	}
 	else {
 		return false;
 	}
+}
+
+void GameScene::AddEnemyBullet(std::unique_ptr<EnemyBullet> enemyBullet) {
+	eneBullets_.push_back(std::move(enemyBullet));
 }
