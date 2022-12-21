@@ -11,7 +11,7 @@ void EnemyBullet::Initialize(Model* model, const Vector3& position, Vector3 vect
 	//eneVec.normalize();
 
 	isDead = false;
-	deadCount = 300;
+	deadCount = 150;
 
 	worldTransform_.Initialize();
 
@@ -28,9 +28,9 @@ void EnemyBullet::Update()
 	if (isDead==false) {
 		if (deadCount > 0) {			
 
-			worldTransform_.translation_ += bulletSpe*0.1;
+			worldTransform_.translation_ += bulletSpe;
 
-			worldTransform_.matWorld_ *= Affin::matWorld(worldTransform_.translation_, worldTransform_.rotation_, worldTransform_.scale_);
+			worldTransform_.matWorld_ = Affin::matWorld(worldTransform_.translation_, worldTransform_.rotation_, worldTransform_.scale_);
 			//çsóÒÇÃçƒåvéZ
 			worldTransform_.TransferMatrix();
 
@@ -39,6 +39,7 @@ void EnemyBullet::Update()
 		}
 		else {
 			isDead = true;
+			deadCount = 150;
 		}
 	}
 }
