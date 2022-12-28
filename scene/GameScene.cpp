@@ -8,6 +8,8 @@
 #include"Affin.h"
 #define PI 3.14
 
+const Vector3 Lerp(const Vector3& start, const Vector3& end, const float t);
+
 float GameScene::Angle(float angle)
 {
 	return angle * PI / 180;
@@ -167,7 +169,7 @@ void GameScene::Update() {
 
 		//敵ポップ
 		for (int i = 0; i < _countof(enemys); i++) {
-				enemys[i].SetGameScene(gameScene_);
+			enemys[i].SetGameScene(gameScene_);
 		}
 		if (waitTimer == 0) {
 			if (popCount > 0) {
@@ -175,7 +177,7 @@ void GameScene::Update() {
 					for (int i = 0; i < _countof(enemys); i++) {
 						if (enemys[i].isDead == true) {
 							enemys[i].Pop(Affin::GetWorldTrans(PopPos_[popRand].matWorld_), popRand);
-							
+
 							break;
 						}
 					}
@@ -397,28 +399,102 @@ void GameScene::Update() {
 		}
 
 
+		//// カメラ移動更新処理
+		// スタート地点	：start
+		// エンド地点		：end
+		// 経過時間		：elapsedTime [s]
+		// 移動完了の率（経過時間/全体時間） ：timeRate (%)
+		nowCount++;
+		
+		if (input_->TriggerKey(DIK_R)) {
+			startCount = nowCount;
+			switch (cameraState)
+			{
+			case 0:
+				cameraState = 1;
+				break;
+			case 2:
+				cameraState = 3;
+				break;
+			}
+		}
+		elapsedCount = nowCount - startCount;
+		elapsedTime = static_cast<float> (elapsedCount) / 1.0f;
+		timeRate = min(elapsedTime / maxTime, 1.0f);
 
-		if (input_->PushKey(DIK_R)) {
+		DebugText::GetInstance()->SetPos(30, 200);
+		DebugText::GetInstance()->Printf(
+			"00 : %f", timeRate);
+		if (cameraState == 1) {			
+			Vector3 A, B,C, AB, AC, FL, FLst, FLen;
+			p0 = Affin::GetWorldTrans(playerWTF[1].matWorld_);
+			p1 = Vector3(0, 0, 0);
+			p2 = Vector3(0, 150, 0);
+			p3 = Vector3(0, 150, 1);
+			A = Lerp(p0, p1, timeRate);
+			B = Lerp(p1, p2, timeRate);
+			C = Lerp(p1, p3, timeRate);
+			AB = Lerp(A, B, timeRate);
+			AC = Lerp(A, C, timeRate - 0.1);
+			FLst = Vector3(90, 0, 0);
+			FLen = Vector3(20, 0, 1);
+			FL = Lerp(FLst, FLen, timeRate-0.1);
+			focalLengs = FL.x;
+
+			viewProjection_.eye = AB;
+			viewProjection_.target = AC;
+			if (timeRate >= 1.0) {
+				cameraState = 2;
+			}
+			
+
+			DebugText::GetInstance()->SetPos(300, 80);
+			DebugText::GetInstance()->Printf(
+				"viewEye : %f %f %f", AB.x,AB.y, AB.z);
+
+		}
+		if (cameraState == 3) {
+			Vector3 A, B, C, AB, AC, FL, FLst, FLen;
+			p0 = Vector3(0,150,0);
+			p1 = Vector3(0, 0, 0);
+			p2 = Affin::GetWorldTrans(playerWTF[1].matWorld_);
+			p3 = Affin::GetWorldTrans(worldTransform3DReticle_.matWorld_);
+			A = Lerp(p0, p1, timeRate);
+			B = Lerp(p1, p2, timeRate);
+			C = Lerp(p1, p3, timeRate);
+			AB = Lerp(A, B, timeRate-0.01);
+			AC = Lerp(A, C, timeRate);
+			FLst = Vector3(20, 0, 0);
+			FLen = Vector3(90, 0, 1);
+			FL = Lerp(FLst, FLen, timeRate - 0.1);
+			focalLengs = FL.x;
+
+			viewProjection_.eye = AB;
+			viewProjection_.target = AC;
+			if (timeRate >= 1.0) {
+				cameraState = 0;
+			}
+		}
+
+
+
+
+		if (cameraState == 0) {
 			ai = Affin::GetWorldTrans(playerWTF[1].matWorld_);
 			focalLengs = 90;
 
 			viewProjection_.eye = { ai.x,ai.y,ai.z };
 			viewProjection_.target = Affin::GetWorldTrans(worldTransform3DReticle_.matWorld_);
 		}
-		else if (input_->PushKey(DIK_E)) {
+		else if (cameraState == 2) {
 			focalLengs = 20;
 
 			viewProjection_.eye = Vector3(0, 150, 0);
 			viewProjection_.target = Affin::GetWorldTrans(playerWTF[1].matWorld_);
 
 		}
-		else {
-			ai = Affin::GetWorldTrans(playerWTF[1].matWorld_);
-			focalLengs = 90;
-			viewProjection_.eye = { ai.x,ai.y,ai.z };
-			viewProjection_.target = Affin::GetWorldTrans(worldTransform3DReticle_.matWorld_);
-		}
-		viewProjection_.fovAngleY = 2 * atan(35.0f / (2 * focalLengs));
+
+		viewProjection_.fovAngleY = (2 * atan(35.0f / (2 * focalLengs)));
 
 		viewProjection_.UpdateMatrix();
 		viewProjection_.TransferMatrix();
@@ -651,4 +727,9 @@ int GameScene::CheckAlive(Enemy enemys_[]) {
 
 void GameScene::AddEnemyBullet(std::unique_ptr<EnemyBullet> enemyBullet) {
 	eneBullets_.push_back(std::move(enemyBullet));
+}
+const Vector3 Lerp(const Vector3& start, const Vector3& end, const float t) {
+	/*float y = t;
+	return start * (1.0f - y) + end * y;*/
+	return start * (1.0f - t) + end * t;
 }

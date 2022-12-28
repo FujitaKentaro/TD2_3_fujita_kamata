@@ -154,21 +154,21 @@ void Enemy::Attack(Model* model_)
 	Vector3 pos;
 
 
+	if (isDead == false) {
+		//弾を生成し、初期化
+		std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
+		//Bullet* newbullet = new Bullet();
 
-	//弾を生成し、初期化
-	std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
-	//Bullet* newbullet = new Bullet();
+		pos = worldTransForm.translation_;
 
-	pos = worldTransForm.translation_;
+		newBullet->Initialize(model_, pos, enemyFront);
 
-	newBullet->Initialize(model_, pos, enemyFront);
+		//弾を登録
+		//bullets_.push_back(std::move(newBullet));
+		gameScene->AddEnemyBullet(std::move(newBullet));
 
-	//弾を登録
-	//bullets_.push_back(std::move(newBullet));
-	gameScene->AddEnemyBullet(std::move(newBullet));
+		//クールタイムをリセット
+		coolTime = 250;
 
-	//クールタイムをリセット
-	coolTime = 250;
-
-
+	}
 }

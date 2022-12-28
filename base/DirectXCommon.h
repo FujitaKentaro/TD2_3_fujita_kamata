@@ -6,6 +6,8 @@
 #include <d3dx12.h>
 #include <dxgi1_6.h>
 #include <wrl.h>
+#include <chrono>
+
 
 #include "WinApp.h"
 
@@ -127,4 +129,12 @@ class DirectXCommon {
 	/// フェンス生成
 	/// </summary>
 	void CreateFence();
+
+	/// <summary>
+	/// FPS
+	/// </summary>
+	void InitializeFixFPS();
+	void UpdateFixFPS();
+	std::chrono::steady_clock::time_point reference_;
+
 };

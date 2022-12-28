@@ -138,4 +138,24 @@ private: // メンバ変数
 	Vector3 move = { 0,0,0 };
 
 	int aliveNum = 0;
+
+	int cameraState = 0;
+	// 時間計測に必要なデータ
+	long long startCount = 0;
+	long long nowCount = 0;
+	long long elapsedCount = 0;
+	float elapsedTime=0;
+	
+
+	// 補間で使うデータ
+	// start -> end を 5[ｓ] で完了させる
+	Vector3 p0,p1,p2,p3;
+	//Vector3 p0, p1, p2, p3;
+	float maxTime = 50.0f;
+	float timeRate;
+	float maxTimeRate;
+
+	// ゲームループで使う変数の宣言
+
+	Vector3 BJEye,BJTarget;
 };
